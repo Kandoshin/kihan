@@ -1,0 +1,542 @@
+﻿import os
+import json
+import time
+import numpy as np
+import cv2
+import mss
+import torch
+import pyautogui
+import gym
+from gym import spaces
+from stable_baselines3 import PPO
+from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+from typing import Tuple
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+import random
+import torch.nn.functional as F
+import keyboard
+
+
+# ---------- 路径/超参 ----------
+YOLO_PATH   = r"G:\god\yolov5\yolov5-7.0\yolov5-7.0"
+MODEL_PATH  = r"G:\god\yolov5\yolov5-7.0\yolov5-7.0\best.pt"
+GAME_REGION = {"left": 0, "top": 46, "width": 945, "height": 535}
+DEVICE      = "cuda:0" if torch.cuda.is_available() else "cpu"
+CONF_THRES, IOU_THRES = 0.6, 0.8
+TARGET_CLASSES = {'p', 'b', 'r', 's', 'wm', 'rm'}
+
+PPO_MODEL_PATH = r"G:\god\pycharm\PythonProject\test\final\ppo_realtime.zip"
+
+# ---------- YOLO ----------
+yolo_model = torch.hub.load(YOLO_PATH, 'custom', path=MODEL_PATH, source='local', device=DEVICE)
+yolo_model.conf, yolo_model.iou = CONF_THRES, IOU_THRES
+yolo_model.eval()
+
+# ---------- CNN ----------
+img_size = 70
+save_dir = r"G:\god\pycharm\PythonProject\test\cnn\models"
+class_map_path = os.path.join(save_dir, "class_to_idx.json")
+with open(class_map_path, "r", encoding="utf-8") as f:
+    class_to_idx = json.load(f)
+idx_to_class = {v: k for k, v in class_to_idx.items()}
+num_classes = len(class_to_idx)
+
+cnn_model = models.resnet18(weights=None)
+cnn_model.fc = nn.Linear(cnn_model.fc.in_features, num_classes)
+cnn_model.load_state_dict(torch.load(os.path.join(save_dir, "best.pth"), map_location=DEVICE))
+cnn_model.to(DEVICE).eval()
+
+transform = transforms.Compose([
+    transforms.Resize((img_size, img_size)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.5], [0.5])
+])
+embedding_dim = 16
+embedding_layer = nn.Embedding(num_classes, embedding_dim).to(DEVICE)
+
+# ---------- 区域 ----------
+cnn_regions = [
+    {"left": 30,  "top": 48,  "width": 70, "height": 70, "name": "1p"},
+    {"left": 845, "top": 48,  "width": 70, "height": 70, "name": "2p"},
+    {"left": 824, "top": 151, "width": 56, "height": 56, "name": "summon"},
+    {"left": 824, "top": 238, "width": 56, "height": 56, "name": "scroll"},
+    {"left": 624, "top": 506, "width": 30, "height": 30, "name": "stand"},
+    {"left": 726, "top": 505, "width": 30, "height": 30, "name": "skill1"},
+    {"left": 738, "top": 400, "width": 30, "height": 30, "name": "skill2"},
+    {"left": 96,  "top": 92,  "width": 60, "height": 16, "name": "1p_energy"},
+    {"left": 790, "top": 92,  "width": 60, "height": 16, "name": "2p_energy"},
+    {"left": 428, "top": 83,  "width": 88, "height": 66, "name": "time"},  # 新增 time
+]
+
+MONITOR_1P = {"left": 99,  "top": 78, "width": 175, "height": 9}
+MONITOR_2P = {"left": 672, "top": 78, "width": 175, "height": 9}
+HSV_LOW, HSV_HIGH = np.array([0, 200, 200]), np.array([10, 255, 255])
+KERNEL = np.ones((3, 3), np.uint8)
+
+# ---------- 工具 ----------
+def normalize_tuple(x, y, w, h, W, H):
+    return (round(x / W, 4), round(y / H, 4), round(w / W, 4), round(h / H, 4))
+
+def get_health(crop, last):
+    hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, HSV_LOW, HSV_HIGH)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, KERNEL)
+    row_counts = np.sum(mask[2:7] > 0, axis=1)
+    if len(row_counts) == 0: return last
+    max_val = int(np.max(row_counts))
+    use_val = max_val
+    return round(max(0, min(use_val / 166.0, 1.0)) * 100, 4)
+
+# ---------- Gym ----------
+KEYS = ['w', 's', 'a', 'd', 'j', 'k', 'l', 'i', 'u', 'o', 'q', 'e', 'space']
+
+YOLO_DIM = len(TARGET_CLASSES) * 4 * 10
+BASE_DIM = 2  # 只保留 rblood, bblood
+CNN_DIM = 0
+for reg in cnn_regions:
+    name = reg["name"]
+    if name in {"1p", "2p"}:
+        CNN_DIM += 16
+    elif name in {"summon", "scroll"}:
+        CNN_DIM += 16
+    elif name in {"stand", "skill1", "skill2"}:
+        CNN_DIM += 1
+    elif name in {"1p_energy", "2p_energy"}:
+        CNN_DIM += 1
+    elif name == "time":
+        CNN_DIM += 1  # 新增 time 一维
+
+OBS_DIM = BASE_DIM + YOLO_DIM + CNN_DIM
+
+class RealtimeGameEnv(gym.Env):
+    def __init__(self):
+        super().__init__()
+        self.demo_buffer = None
+        self.action_space = spaces.MultiBinary(len(KEYS))
+        self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(OBS_DIM,), dtype=np.float32)
+        self.sct = mss.mss()
+        self.last_health = [100.0, 100.0]
+        self.last_big_reward_time = 0
+        self.start_counter = 0
+        self.end_counter_time = 0
+        self.end_counter_p1 = 0
+        self.end_counter_p2 = 0
+        self.b_zero_frames = 0
+        self.r_zero_frames = 0
+        self.bblood = 1.0
+        self.rblood = 1.0
+        self.assign_flag = None
+        self.last_bblood = 1.0
+        self.last_rblood = 1.0
+        self.b_reached_zero = False
+        self.r_reached_zero = False
+        self.last_big_reward_time = 0.0
+        self.init_bblood = 1.0
+        self.init_rblood = 1.0
+        self.human_action = [0] * len(KEYS)
+        self.last_human_time = 0
+
+    def check_human_input(self):
+        pressed = [int(keyboard.is_pressed(k)) for k in KEYS]
+        if any(pressed):  # 有人类输入
+            self.human_action = pressed
+            self.last_human_time = time.time()
+            return True
+        return False
+
+    def release_all_keys(self):
+        for k in KEYS:
+            try:
+                pyautogui.keyUp(k)
+            except Exception:
+                pass
+
+    def _get_obs(self) -> Tuple[np.ndarray, float, float, float, set]:
+        full_img = np.array(self.sct.grab(self.sct.monitors[0]))[..., :3]
+
+        # ---- YOLO ----
+        g = GAME_REGION
+        game_crop = full_img[g['top']:g['top'] + g['height'], g['left']:g['left'] + g['width']]
+        results = yolo_model(cv2.cvtColor(game_crop, cv2.COLOR_BGR2RGB), size=320)
+        class_to_idx = {'p': 0, 's': 1, 'r': 2, 'b': 3, 'wm': 4, 'rm': 5}
+        boxes = {k: [] for k in TARGET_CLASSES}
+        detected_classes = set()
+        for *xyxy, conf, cls in results.pred[0]:
+            cls_name = yolo_model.names[int(cls)]
+            if cls_name in boxes:
+                detected_classes.add(cls_name)
+                x1, y1, x2, y2 = map(float, xyxy)
+                x_c, y_c = (x1 + x2) / 2, (y1 + y2) / 2
+                norm_box = normalize_tuple(x_c, y_c, x2 - x1, y2 - y1, g['width'], g['height'])
+                one_hot_conf = [0.0] * 6
+                one_hot_conf[class_to_idx[cls_name]] = float(conf)
+                box_with_conf = list(norm_box) + one_hot_conf
+                boxes[cls_name].append(box_with_conf)
+
+        yolo_flat = []
+        for cls in sorted(TARGET_CLASSES):
+            cls_boxes = boxes[cls][:4]
+            while len(cls_boxes) < 4:
+                cls_boxes.append([0.0] * 10)
+            for box in cls_boxes:
+                yolo_flat.extend(box)
+
+        # ---- 血量 ----
+        crop1 = full_img[MONITOR_1P['top']:MONITOR_1P['top'] + MONITOR_1P['height'],
+                         MONITOR_1P['left']:MONITOR_1P['left'] + MONITOR_1P['width']]
+        crop2 = full_img[MONITOR_2P['top']:MONITOR_2P['top'] + MONITOR_2P['height'],
+                         MONITOR_2P['left']:MONITOR_2P['left'] + MONITOR_2P['width']]
+
+        p1_blood = get_health(crop1, self.last_health[0]) / 100.0
+        p2_blood = get_health(crop2, self.last_health[1]) / 100.0
+        self.last_health = [p1_blood * 100, p2_blood * 100]
+
+        # ---- CNN ----
+        cnn_vecs = []
+        batch = []
+        for reg in cnn_regions:
+            crop = full_img[reg["top"]:reg["top"] + reg["height"], reg["left"]:reg["left"] + reg["width"]]
+            img_rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+            pil_img = Image.fromarray(img_rgb)
+            batch.append(transform(pil_img))
+        batch_tensor = torch.stack(batch).to(DEVICE)
+        with torch.no_grad():
+            preds = torch.argmax(cnn_model(batch_tensor), dim=1).cpu().numpy()
+
+        time_val = -1.0
+        for reg, id_int in zip(cnn_regions, preds):
+            label = idx_to_class[id_int]
+            name = reg["name"]
+
+            if name in {"1p", "2p"}:
+                if label == "none":
+                    cnn_vecs.extend([0.0] * 16)
+                else:
+                    vec = embedding_layer(torch.tensor([id_int], device=DEVICE)).squeeze(0).detach().cpu().numpy()
+                    cnn_vecs.extend(vec.tolist())
+            elif name in {"stand", "skill1", "skill2"}:
+                cnn_vecs.append(int(label) / 60.0 if label.isdigit() else 0.0)
+            elif name in {"summon", "scroll"}:
+                if label.isdigit():
+                    val = int(label) / 60.0
+                    cnn_vecs.extend([val] * 16)
+                elif label == "none":
+                    cnn_vecs.extend([0.0] * 16)
+                else:
+                    vec = embedding_layer(torch.tensor([id_int], device=DEVICE)).squeeze(0).detach().cpu().numpy()
+                    cnn_vecs.extend(vec.tolist())
+            elif name in {"1p_energy", "2p_energy"}:
+                cnn_vecs.append(int(label) / 4.0 if label.isdigit() else 0.0)
+            elif name == "time":
+                if label == "none":
+                    time_val = -1.0
+                    cnn_vecs.append(-1.0)
+                elif label.isdigit():
+                    val = int(label)
+                    time_val = round(val / 60.0, 4)
+                    cnn_vecs.append(time_val)
+                else:
+                    time_val = -1.0
+                    cnn_vecs.append(-1.0)
+
+        # ---- 判定血条归属 ----
+        if time_val >= 0.999:
+            self.init_bblood = self.bblood
+            self.init_rblood = self.rblood
+            b_boxes = boxes.get('b', [])
+            if b_boxes:
+                x_c, y_c, w, h = b_boxes[0][:4]
+                left = (x_c - w / 2.0) * g['width']
+                if left > 415:
+                    self.assign_flag = 'right'
+                    print("【判定】b 属于右方 → bblood=2P, rblood=1P")
+                else:
+                    self.assign_flag = 'left'
+                    print("【判定】b 属于左方 → bblood=1P, rblood=2P")
+
+        if self.assign_flag == 'right':
+            self.bblood = p2_blood
+            self.rblood = p1_blood
+        elif self.assign_flag == 'left':
+            self.bblood = p1_blood
+            self.rblood = p2_blood
+        else:
+            self.bblood = p2_blood
+            self.rblood = p1_blood
+
+        base_obs = [self.rblood, self.bblood] + yolo_flat
+        obs = np.array(base_obs + cnn_vecs, dtype=np.float32)
+        return obs, time_val, self.rblood, self.bblood, detected_classes
+
+    # reset(), step(), close() 保持你原来的逻辑
+    # ...
+
+
+    def reset(self):
+        while True:
+            obs, t, _, _, _ = self._get_obs()
+            human_override = self.check_human_input()
+            if abs(t - 1.0) < 1e-3:
+                self.start_counter += 1
+            else:
+                self.start_counter = 0
+
+            if self.start_counter >= 5:
+                print("【提示】游戏开始，环境 reset() 完成")
+                self.start_counter = 0
+                self.end_counter_time = 0
+                self.end_counter_p1 = 0
+                self.end_counter_p2 = 0
+                self.bblood = 1.0
+                self.rblood = 1.0
+                self.last_bblood = 1.0
+                self.last_rblood = 1.0
+                self.b_reached_zero = False
+                self.r_reached_zero = False
+                self.assign_flag = None  # ✅ 新局强制清空归属
+                # 注意：self.assign_flag 不在 reset 时被强制清空（按你的选择）
+                self.b_zero_frames = 0
+                self.r_zero_frames = 0
+                self.demo_buffer = []  # ✅ 用来存 (obs, action)
+
+                return obs
+
+            time.sleep(0.1)
+
+    def step(self, action):
+
+        if human_override:
+            action = self.human_action
+            self.release_all_keys()  # 确保先释放，再模拟人操作
+            # 保存人类示范数据
+            self.demo_buffer.append((obs.copy(), action.copy()))
+        elif time.time() - self.last_human_time < 1.0:
+            # 最近1秒内有人操作 → AI 不接管
+            action = [0] * len(KEYS)
+        else:
+            # 正常由 AI 控制
+            pass
+
+
+        # 按键控制（按下/弹起）
+        for i, pressed in enumerate(action):
+            try:
+                if pressed:
+                    pyautogui.keyDown(KEYS[i])
+                else:
+                    pyautogui.keyUp(KEYS[i])
+            except Exception:
+                pass
+
+        obs, t, p1, p2, detected_classes = self._get_obs()
+        reward = 0.0
+        change_log = []  # 收集变化原因
+
+        # ---------- 改进后的血量差奖励 ----------
+        delta_b = (self.init_bblood - self.bblood) * 100
+        delta_r = (self.init_rblood - self.rblood) * 100
+
+        reward = delta_r - delta_b
+        if abs(reward) > 1e-6:
+            print(f"[Reward] {reward:+.1f} (Δr={delta_r:.1f}, Δb={delta_b:.1f})")
+
+        # 更新上一帧血量缓存（用于下一帧 delta）
+        self.last_bblood = self.bblood
+        self.last_rblood = self.rblood
+
+        # ---------- 结束条件判定 ----------
+        if abs(t) < 1e-3:
+            self.end_counter_time += 1
+        else:
+            self.end_counter_time = 0
+        if p1 <= 0:
+            self.end_counter_p1 += 1
+        else:
+            self.end_counter_p1 = 0
+        if p2 <= 0:
+            self.end_counter_p2 += 1
+        else:
+            self.end_counter_p2 = 0
+
+        done = False
+        if (self.end_counter_time >= 2 or self.end_counter_p1 >= 2 or self.end_counter_p2 >= 2):
+            done = True
+            print("【提示】游戏结束")
+
+
+            # 结束时释放所有按键，避免“粘键”
+            self.release_all_keys()
+            # 清计数器
+            self.end_counter_time = 0
+            self.end_counter_p1 = 0
+            self.end_counter_p2 = 0
+
+        return obs, reward, done, {}
+
+    def close(self):
+        try:
+            self.release_all_keys()
+        except Exception:
+            pass
+        self.sct.close()
+
+# ---------- 自定义策略 ----------
+class CustomExtractor(BaseFeaturesExtractor):
+    def __init__(self, observation_space: spaces.Box, features_dim: int = 256):
+        super().__init__(observation_space, features_dim)
+        input_dim = observation_space.shape[0]
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 256), nn.ReLU(),
+            nn.Linear(256, 256), nn.ReLU(),
+            nn.Linear(256, features_dim)
+        )
+    def forward(self, obs):
+        return self.net(obs)
+
+policy_kwargs = dict(features_extractor_class=CustomExtractor,
+                     features_extractor_kwargs=dict(features_dim=256))
+
+# ---------- 训练 ----------
+if __name__ == "__main__":
+    env = DummyVecEnv([lambda: RealtimeGameEnv()])
+
+    if os.path.exists(PPO_MODEL_PATH):
+        try:
+            print("【提示】加载已有模型继续训练")
+            model = PPO.load(PPO_MODEL_PATH, env=env)
+        except Exception as e:
+            print(f"加载已有模型失败，准备新建模型。错误：{e}")
+            model = CustomPPO("MlpPolicy", env, policy_kwargs=policy_kwargs, imitation_weight=0.1,
+                        verbose=1, n_steps=512, batch_size=256, learning_rate=3e-4)
+    else:
+        print("【提示】新建 PPO 模型")
+        model = CustomPPO("MlpPolicy", env, policy_kwargs=policy_kwargs, imitation_weight=0.1,
+                    verbose=1, n_steps=512, batch_size=256, learning_rate=3e-4)
+
+    try:
+        print("【提示】开始训练")
+        model.learn(total_timesteps=50000)
+        print("【提示】训练完成")
+    except KeyboardInterrupt:
+        print("【提示】手动中断，正在保存模型…")
+    # 训练完成后，把示范数据保存到文件，方便下次加载
+
+    finally:
+        try:
+            model.save(PPO_MODEL_PATH)
+            print(f"【提示】模型已保存到 {PPO_MODEL_PATH}")
+            if len(env.envs[0].demo_buffer) > 0:
+                np.save("demo_data.npy", np.array(env.envs[0].demo_buffer, dtype=object))
+                print(f"【提示】保存了 {len(env.envs[0].demo_buffer)} 条人类示范数据")
+        except Exception as e:
+            print(f"保存模型失败：{e}")
+        # 释放按键并关闭 env
+        try:
+            for ev in env.envs:
+                try:
+                    ev.release_all_keys()
+                except Exception:
+                    pass
+            env.close()
+        except Exception:
+            pass
+# ----------------- CustomPPO (PPO + Imitation Loss / DAgger friendly) -----------------
+class CustomPPO(PPO):
+    """
+    在原始 PPO 的训练循环上加入 imitation loss（behavior cloning）：
+      imitation_loss = - mean( log_prob_pi(a_demo | s_demo) )
+    最终 loss = policy_loss + vf_coef * value_loss + ent_coef * entropy_loss + imitation_weight * imitation_loss
+
+    要点：
+    - 从 env.envs[0].demo_buffer 中随机抽样示范 (obs, action) 批次用于计算 imitation loss。
+    - demo_buffer 中的 action 需要与 policy 输出的动作空间格式一致（MultiBinary: 0/1 列表）。
+    - imitation_weight: 控制监督信号强度（可调）。
+    """
+    def __init__(self, *args, imitation_weight: float = 0.1, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.imitation_weight = imitation_weight
+
+    def train(self) -> None:
+        """
+        重写 train()：基于 stable-baselines3 PPO 的训练循环，
+        在每个 batch 上加上 imitation loss（若 demo_buffer 有数据）。
+        """
+        # 切换 policy 到训练模式
+        self.policy.train()
+
+        # 计算 clip_range（支持 callable 或 float）
+        if callable(self.clip_range):
+            clip_range = self.clip_range(self._current_progress_remaining)
+        else:
+            clip_range = self.clip_range
+
+        # 一次 epoch 的训练循环（简化实现，兼容常规 sb3 rollout_buffer）
+        for _ in range(self.n_epochs):
+            for rollout_data in self.rollout_buffer.get(self.batch_size):
+                # 评估当前策略分布、value、log_prob、entropy
+                values, log_prob, entropy = self.policy.evaluate_actions(
+                    rollout_data.observations, rollout_data.actions
+                )
+
+                # Advantage 归一化（如果启用）
+                advantages = rollout_data.advantages
+                if self.normalize_advantage:
+                    advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+
+                # 计算 ratio & surrogate losses
+                ratio = torch.exp(log_prob - rollout_data.old_log_prob)
+                surr1 = ratio * advantages
+                surr2 = torch.clamp(ratio, 1.0 - clip_range, 1.0 + clip_range) * advantages
+                policy_loss = -torch.min(surr1, surr2).mean()
+
+                # value loss + entropy loss
+                value_loss = F.mse_loss(rollout_data.returns, values.flatten())
+                entropy_loss = -torch.mean(entropy)
+
+                # imitation loss（从 env 的 demo_buffer 里抽样）
+                imitation_loss = 0.0
+                try:
+                    if hasattr(self.env, "envs") and len(self.env.envs) > 0:
+                        env0 = self.env.envs[0]
+                        demo = getattr(env0, "demo_buffer", None)
+                        if demo and len(demo) > 0:
+                            k = min(len(demo), max(1, int(self.batch_size)))
+                            sample = random.sample(demo, k)
+                            obs_demo = torch.tensor(
+                                [d[0] for d in sample],
+                                dtype=torch.float32,
+                                device=self.device,
+                            )
+                            act_demo = torch.tensor(
+                                [d[1] for d in sample],
+                                dtype=torch.float32,
+                                device=self.device,
+                            )
+                            # get_distribution 返回一个可微分的分布对象
+                            dist = self.policy.get_distribution(obs_demo)
+                            # 负对数似然作为 imitation loss（越小越好）
+                            imitation_loss = -torch.mean(dist.log_prob(act_demo))
+                except Exception:
+                    # 若任何异常都忽略 imitation loss（保持训练稳健）
+                    imitation_loss = 0.0
+
+                # 总 loss（与 SB3 的组合形式一致）
+                loss = (
+                    policy_loss
+                    + self.vf_coef * value_loss
+                    + self.ent_coef * entropy_loss
+                    + self.imitation_weight * imitation_loss
+                )
+
+                # 优化一步
+                self.policy.optimizer.zero_grad()
+                loss.backward()
+                # 可选：梯度裁剪
+                if self.max_grad_norm is not None:
+                    torch.nn.utils.clip_grad_norm_(
+                        self.policy.parameters(), self.max_grad_norm
+                    )
+                self.policy.optimizer.step()

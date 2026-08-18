@@ -1,0 +1,507 @@
+{
+  "total_episodes": 220,
+  "total_timesteps": 220000,
+  "last_save_time": "2026-01-26 19:02:49",
+  "training_history": [
+    {
+      "episode": 121,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:29:28"
+    },
+    {
+      "episode": 122,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:30:28"
+    },
+    {
+      "episode": 123,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:31:31"
+    },
+    {
+      "episode": 124,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:32:52"
+    },
+    {
+      "episode": 125,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:33:50"
+    },
+    {
+      "episode": 126,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:34:50"
+    },
+    {
+      "episode": 127,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:36:05"
+    },
+    {
+      "episode": 128,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:37:08"
+    },
+    {
+      "episode": 129,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:38:06"
+    },
+    {
+      "episode": 130,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:39:07"
+    },
+    {
+      "episode": 131,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:40:04"
+    },
+    {
+      "episode": 132,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:41:18"
+    },
+    {
+      "episode": 133,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:42:24"
+    },
+    {
+      "episode": 134,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:43:22"
+    },
+    {
+      "episode": 135,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:50:50"
+    },
+    {
+      "episode": 136,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:51:42"
+    },
+    {
+      "episode": 137,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:52:42"
+    },
+    {
+      "episode": 138,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:53:55"
+    },
+    {
+      "episode": 139,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:55:12"
+    },
+    {
+      "episode": 140,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:56:11"
+    },
+    {
+      "episode": 141,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:57:13"
+    },
+    {
+      "episode": 142,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:58:15"
+    },
+    {
+      "episode": 143,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 21:59:15"
+    },
+    {
+      "episode": 144,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:00:34"
+    },
+    {
+      "episode": 145,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:01:37"
+    },
+    {
+      "episode": 146,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:02:40"
+    },
+    {
+      "episode": 147,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:03:42"
+    },
+    {
+      "episode": 148,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:05:00"
+    },
+    {
+      "episode": 149,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:05:53"
+    },
+    {
+      "episode": 150,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:07:02"
+    },
+    {
+      "episode": 151,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:08:05"
+    },
+    {
+      "episode": 152,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:09:22"
+    },
+    {
+      "episode": 153,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:10:16"
+    },
+    {
+      "episode": 154,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:11:20"
+    },
+    {
+      "episode": 155,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:12:43"
+    },
+    {
+      "episode": 156,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:13:45"
+    },
+    {
+      "episode": 157,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:14:46"
+    },
+    {
+      "episode": 158,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:15:54"
+    },
+    {
+      "episode": 159,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:17:19"
+    },
+    {
+      "episode": 160,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:18:21"
+    },
+    {
+      "episode": 161,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:19:30"
+    },
+    {
+      "episode": 162,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:20:33"
+    },
+    {
+      "episode": 163,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:23:26"
+    },
+    {
+      "episode": 164,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:24:27"
+    },
+    {
+      "episode": 165,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:25:39"
+    },
+    {
+      "episode": 166,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:26:34"
+    },
+    {
+      "episode": 167,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:28:03"
+    },
+    {
+      "episode": 168,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:29:05"
+    },
+    {
+      "episode": 169,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:30:14"
+    },
+    {
+      "episode": 170,
+      "reward": 0.0,
+      "timestamp": "2026-01-25 22:31:18"
+    },
+    {
+      "episode": 171,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:41:17"
+    },
+    {
+      "episode": 172,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:42:53"
+    },
+    {
+      "episode": 173,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:44:01"
+    },
+    {
+      "episode": 174,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:44:57"
+    },
+    {
+      "episode": 175,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:46:20"
+    },
+    {
+      "episode": 176,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:47:25"
+    },
+    {
+      "episode": 177,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:48:26"
+    },
+    {
+      "episode": 178,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:49:28"
+    },
+    {
+      "episode": 179,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:50:43"
+    },
+    {
+      "episode": 180,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:51:48"
+    },
+    {
+      "episode": 181,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:52:52"
+    },
+    {
+      "episode": 182,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:54:25"
+    },
+    {
+      "episode": 183,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:55:29"
+    },
+    {
+      "episode": 184,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:56:31"
+    },
+    {
+      "episode": 185,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:58:12"
+    },
+    {
+      "episode": 186,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 16:59:18"
+    },
+    {
+      "episode": 187,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:00:26"
+    },
+    {
+      "episode": 188,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:01:52"
+    },
+    {
+      "episode": 189,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:02:53"
+    },
+    {
+      "episode": 190,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:03:59"
+    },
+    {
+      "episode": 191,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:06:23"
+    },
+    {
+      "episode": 192,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:07:22"
+    },
+    {
+      "episode": 193,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:08:24"
+    },
+    {
+      "episode": 194,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:09:52"
+    },
+    {
+      "episode": 195,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:10:57"
+    },
+    {
+      "episode": 196,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:12:04"
+    },
+    {
+      "episode": 197,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:13:59"
+    },
+    {
+      "episode": 198,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:15:03"
+    },
+    {
+      "episode": 199,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:16:34"
+    },
+    {
+      "episode": 200,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:17:37"
+    },
+    {
+      "episode": 201,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:18:41"
+    },
+    {
+      "episode": 202,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:20:13"
+    },
+    {
+      "episode": 203,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:21:19"
+    },
+    {
+      "episode": 204,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:22:23"
+    },
+    {
+      "episode": 205,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:23:39"
+    },
+    {
+      "episode": 206,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:24:45"
+    },
+    {
+      "episode": 207,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:25:48"
+    },
+    {
+      "episode": 208,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:28:13"
+    },
+    {
+      "episode": 209,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:29:13"
+    },
+    {
+      "episode": 210,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:30:16"
+    },
+    {
+      "episode": 211,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:31:31"
+    },
+    {
+      "episode": 212,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:32:32"
+    },
+    {
+      "episode": 213,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 17:33:39"
+    },
+    {
+      "episode": 214,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 18:32:38"
+    },
+    {
+      "episode": 215,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 18:33:50"
+    },
+    {
+      "episode": 216,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 18:57:29"
+    },
+    {
+      "episode": 217,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 18:58:37"
+    },
+    {
+      "episode": 218,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 19:00:00"
+    },
+    {
+      "episode": 219,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 19:01:11"
+    },
+    {
+      "episode": 220,
+      "reward": 0.0,
+      "timestamp": "2026-01-26 19:02:18"
+    }
+  ]
+}

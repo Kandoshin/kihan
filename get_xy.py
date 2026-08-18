@@ -1,0 +1,12 @@
+# import pyautogui
+# x,y=pyautogui.position()
+# print(x,y)
+pyautogui.click(864,490,button='left',duration=0.5)
+pyautogui.sleep(2)
+pyautogui.click(864,490,button='left',duration=0.5)
+pyautogui.sleep(2)
+pyautogui.click(864,490,button='left',duration=0.5)
+pyautogui.sleep(20)
+pyautogui.click(466,514,button='left',duration=0.5)
+pyautogui.sleep(2)
+pyautogui.click(746,488,button='left',duration=0.5)

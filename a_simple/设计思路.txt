@@ -1,0 +1,31 @@
+//此次代码重构移除了血量（blood）相关的所有代码，使用bm和rm计算奖励。不再对scroll和summon进行embedding。不再识别energy。
+
+观测空间：
+	yolo部分：p（敌我人物位置），r、b（敌我红蓝框），wm、rm（白色和红色的伤害数字，白色代表我方造成的伤害，红	色代表敌方造成的伤害）。s（技能特效检测）
+	cnn部分：1p_id、2p_id（头像），time（对局时间），stand（替身），skill1（一技能），skill2（二技能），	summon（通灵），scroll（密卷）cd。
+处理：
+	yolo部分：b和r只保留置信度最高的那个，如果没有或者置信度最高的低于0.8，就填0。wm和rm也只保留置信度最高的那个，如果没有或者置信度最高的低于0.8，就填0。p和s保留置信度大于0.8的前四个，没有或者不足的部分在输入状态空间时填零。
+	cnn部分：1p_id、2p_id（头像）部分直接将id传入obs的前两位，assign_flag（左右换位）的结果为1p为自己时（b在左边），obs开头的‘1（bp（自身）的id）’（bp_id）为1p_id，rp_id为2p_id ;2p为自己时，bp_id为2p_id，rp_id为1p_id。
+time（对局时间），stand（替身），skill1（一技能），skill2（二技能），summon（通灵）cd。这些部分除以60进行归一化，识别的结果的标签只会是小于60的数字或者none，当为none时，输入0
+			
+
+对yolo识别的b，r，p，s做类似的以下处理，最后只保留x,y,w,h.
+# 这一步把你得到的绝对坐标除以了图片的宽高，变成了 0~1 之间的小数
+norm = normalize_tuple((x1 + x2) / 2, (y1 + y2) / 2, x2 - x1, y2 - y1, g['width'], g['height'])
+def normalize_tuple(x, y, w, h, W, H):
+    # x, y, w, h 是上面算出来的绝对数值
+    # W, H 是游戏画面的总宽高
+    return (round(x / W, 6), round(y / H, 6), round(w / W, 6), round(h / H, 6))
+
+状态空间（严格按照这个顺序）：（1（bp（自身）的id）+1（rp（敌人）的id）+4（b的x,y,w,h）+4（r的x,y,w,h）+4（四个p的x,y,w,h。）*4+4（四个s的x,y,w,h）*4+1（wm是否存在）+1（rm是否存在）+1（time）+1（stand）+1（skill1）+1（skill2）+1（summon）+1（scroll））。一共50维
+
+obs传入后，重写 CustomExtractor 的 forward 函数分别对obs加工再组装进行embedding，以便ppo模型更新开头的bp_id和rp_id
+
+动作空间：w（上），s（下）,a（左）,d（右）,k（普攻）,j（一技能）,i（二技能）,space（替身）
+
+奖励函数：每帧都要计算奖励，当传入的obs的wm的位置的数据为1时，加0.01分，当传入的obs的rm的位置的数据为1时，扣0.01分，两个计分方式独立计算，只有为1时才改变reward，为0时不处理，不改变reward。//wm存在则代表当前帧对敌人造成了伤害，rm存在则代表自身受到了伤害
+
+Q&A:
+奖励函数的隐患：没关系
+观测空间的数据“对齐”问题：b框一定是自身，r框一定是敌人，yolo能区分b和r
+动作空间：保持现有的 MultiDiscrete 结构

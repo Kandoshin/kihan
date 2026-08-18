@@ -1,0 +1,475 @@
+{
+  "total_episodes": 78,
+  "total_timesteps": 78000,
+  "last_save_time": "2026-01-23 16:06:19",
+  "training_history": [
+    {
+      "episode": 1,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-05 21:53:58"
+    },
+    {
+      "episode": 2,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-05 21:57:54"
+    },
+    {
+      "episode": 3,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-05 23:22:37"
+    },
+    {
+      "episode": 4,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:00:42"
+    },
+    {
+      "episode": 5,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:05:39"
+    },
+    {
+      "episode": 6,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:35:26"
+    },
+    {
+      "episode": 7,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:39:11"
+    },
+    {
+      "episode": 8,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:44:21"
+    },
+    {
+      "episode": 9,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:48:52"
+    },
+    {
+      "episode": 10,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 20:53:24"
+    },
+    {
+      "episode": 11,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:08:57"
+    },
+    {
+      "episode": 12,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:12:55"
+    },
+    {
+      "episode": 13,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:16:26"
+    },
+    {
+      "episode": 14,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:20:55"
+    },
+    {
+      "episode": 15,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:25:58"
+    },
+    {
+      "episode": 16,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:29:21"
+    },
+    {
+      "episode": 17,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:34:17"
+    },
+    {
+      "episode": 18,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:38:29"
+    },
+    {
+      "episode": 19,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:46:16"
+    },
+    {
+      "episode": 20,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:49:40"
+    },
+    {
+      "episode": 21,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 21:56:13"
+    },
+    {
+      "episode": 22,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:00:05"
+    },
+    {
+      "episode": 23,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:03:55"
+    },
+    {
+      "episode": 24,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:08:04"
+    },
+    {
+      "episode": 25,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:11:24"
+    },
+    {
+      "episode": 26,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:15:57"
+    },
+    {
+      "episode": 27,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:19:38"
+    },
+    {
+      "episode": 28,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:29:53"
+    },
+    {
+      "episode": 29,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:36:05"
+    },
+    {
+      "episode": 30,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:39:51"
+    },
+    {
+      "episode": 31,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:52:47"
+    },
+    {
+      "episode": 32,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 22:57:55"
+    },
+    {
+      "episode": 33,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:02:40"
+    },
+    {
+      "episode": 34,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:07:00"
+    },
+    {
+      "episode": 35,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:14:44"
+    },
+    {
+      "episode": 36,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:22:12"
+    },
+    {
+      "episode": 37,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:26:03"
+    },
+    {
+      "episode": 38,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:31:00"
+    },
+    {
+      "episode": 39,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:43:51"
+    },
+    {
+      "episode": 40,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:48:20"
+    },
+    {
+      "episode": 41,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:53:44"
+    },
+    {
+      "episode": 42,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-06 23:58:32"
+    },
+    {
+      "episode": 43,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 00:03:22"
+    },
+    {
+      "episode": 44,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 00:19:59"
+    },
+    {
+      "episode": 45,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 00:54:53"
+    },
+    {
+      "episode": 46,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 00:59:03"
+    },
+    {
+      "episode": 47,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:03:32"
+    },
+    {
+      "episode": 48,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:07:28"
+    },
+    {
+      "episode": 49,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:11:44"
+    },
+    {
+      "episode": 50,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:16:32"
+    },
+    {
+      "episode": 51,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:27:19"
+    },
+    {
+      "episode": 52,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:42:15"
+    },
+    {
+      "episode": 53,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:46:02"
+    },
+    {
+      "episode": 54,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 01:55:08"
+    },
+    {
+      "episode": 55,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:06:23"
+    },
+    {
+      "episode": 56,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:15:35"
+    },
+    {
+      "episode": 57,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:19:32"
+    },
+    {
+      "episode": 58,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:27:49"
+    },
+    {
+      "episode": 59,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:35:42"
+    },
+    {
+      "episode": 60,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:40:30"
+    },
+    {
+      "episode": 61,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 02:51:31"
+    },
+    {
+      "episode": 62,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 03:05:30"
+    },
+    {
+      "episode": 63,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 03:10:33"
+    },
+    {
+      "episode": 64,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 03:16:29"
+    },
+    {
+      "episode": 65,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 10:33:30"
+    },
+    {
+      "episode": 66,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 10:45:31"
+    },
+    {
+      "episode": 67,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 10:54:18"
+    },
+    {
+      "episode": 68,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:06:26"
+    },
+    {
+      "episode": 69,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:11:57"
+    },
+    {
+      "episode": 70,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:18:22"
+    },
+    {
+      "episode": 71,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:25:33"
+    },
+    {
+      "episode": 72,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:34:39"
+    },
+    {
+      "episode": 73,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:45:00"
+    },
+    {
+      "episode": 74,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 11:52:05"
+    },
+    {
+      "episode": 75,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-07 12:01:59"
+    },
+    {
+      "episode": 76,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-19 19:13:27"
+    },
+    {
+      "episode": 77,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-19 19:17:54"
+    },
+    {
+      "episode": 78,
+      "reward": 0.0,
+      "timesteps": 1000,
+      "timestamp": "2025-10-19 19:22:12"
+    }
+  ]
+}
